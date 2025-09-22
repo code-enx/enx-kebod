@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Keyboard Sound Daemon (Deprecated)
+Comment=Deprecated entry (disabled)
+Exec=/bin/true
+Hidden=true
+NoDisplay=true
+X-GNOME-Autostart-enabled=false
+StartupNotify=false
+Terminal=false

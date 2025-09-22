@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=enx-kebord Daemon
+GenericName=Keyboard Sound Daemon
+Comment=Background daemon for keyboard sounds (auto-start)
+Exec=launch_daemon.sh
+Icon=enx-kebord-icon.png
+Terminal=false
+Categories=System;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+StartupNotify=false

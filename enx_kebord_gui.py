@@ -42,7 +42,8 @@
          self.root = root
          self.setup_window()
          self.load_config()
-         self.create_widgets()
+         # FIX: The create_widgets method requires a parent argument, so we pass the root window.
+         self.create_widgets(self.root)
          self.update_status()
          self.start_status_monitor()
 
@@ -527,7 +528,7 @@
              for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
                  try:
                      cmdline = ' '.join(proc.info['cmdline'] or [])
-                     if 'keyboard_sound_daemon' in cmdline or 'enx-kebord' in cmdline:
+                     if 'keyboard_sound_daemon' in cmdline or 'enx_kebord' in cmdline:
                          proc.kill()
                          killed_count += 1
                  except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):

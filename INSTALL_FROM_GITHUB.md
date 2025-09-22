@@ -3,7 +3,7 @@
 ## Quick One-Line Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/code-enx/enx kebod/main/install.sh | bash -s -- --from-github
+curl -fsSL https://raw.githubusercontent.com/code-enx/enx-kebod/main/install.sh | bash -s -- --from-github
 ```
 
 ## Manual Installation
@@ -11,7 +11,7 @@ curl -fsSL https://raw.githubusercontent.com/code-enx/enx kebod/main/install.sh 
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/code-enx/enx kebod.git
-cd Mech_keyboard_enx-
+cd enx-kebod
 ```
 
 ### 2. Run the Installer

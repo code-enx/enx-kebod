@@ -14,8 +14,8 @@ Thank you for your interest in contributing! 🎉
 
 ## 🎯 Ways to Contribute
 
-### 🐛 Bug Reports
-- Use the [issue tracker](https://github.com/code-enx/Mech_keyboard_enx-/issues)
+###  Bug Reports
+- Use the [issue tracker](https://github.com/code-enx/enx-kebod/issues)
 - Include steps to reproduce
 - Mention your OS and Python version
 

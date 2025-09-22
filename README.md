@@ -20,14 +20,14 @@ Transform any keyboard into a satisfying mechanical keyboard experience with our
 
 ### One-Line Install (Recommended)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/code-enx/enx kebod/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/code-enx/enx-kebod/main/install.sh | bash
 ```
 
 ### Manual Install
 ```bash
 # Clone the repository
-git clone https://github.com/code-enx/enx kebod.git
-cd "enx kebod"
+git clone https://github.com/code-enx/enx-kebod.git
+cd "enx-kebod"
 
 # Run the installer
 chmod +x install.sh
@@ -37,8 +37,8 @@ chmod +x install.sh
 ### Development setup (any path, venv-only)
 ```bash
 # Clone the repository to any directory
-git clone https://github.com/code-enx/enx kebod.git
-cd "enx kebod"
+git clone https://github.com/code-enx/enx-kebod.git
+cd "enx-kebod"
 
 # Setup venv, install deps, generate sounds (uses local venv, not system Python)
 ./setup_enhanced.sh
@@ -55,7 +55,7 @@ cd "enx kebod"
 
 That's it! The installer will:
 - ✅ Check all dependencies
-- ✅ Install the application to `~/.local/share/enx-kebord`
+- ✅ Install the application to `~/.local/share/enx-kebod`
 - ✅ Create desktop entries and menu integration
 - ✅ Set up auto-startup for the daemon
 - ✅ Generate all 16 keyboard sounds
@@ -86,7 +86,7 @@ enx-kebord
 - **Brown** - Cherry MX Brown style (tactile bump)
 - **Red** - Cherry MX Red style (linear, quiet)
 
-### 🔧 Advanced Mechanical  
+### 🔧 Advanced Mechanical
 - **Hard** 🆕 - Extremely aggressive (metal-on-metal)
 - **Mechanical** - Heavy IBM Model M style
 - **Thock** - Deep Topre-style sound
@@ -130,7 +130,7 @@ enx-kebord
 ### Quick Uninstall
 ```bash
 # Download and run uninstaller
-curl -fsSL https://raw.githubusercontent.com/code-enx/enx kebod/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/code-enx/enx-kebod/main/uninstall.sh | bash
 ```
 
 ### Manual Uninstall

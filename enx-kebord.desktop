@@ -1,4 +1,4 @@
- [Desktop Entry]
+[Desktop Entry]
 Version=1.0
 Type=Application
 Name=ENX-Kebord
@@ -7,8 +7,3 @@ Comment=Mechanical keyboard sound experience with beautiful GUI
 Exec=/opt/enx-kebord/launch_gui.sh
 Icon=/opt/enx-kebord/enx-kebord-icon.png
 Path=/opt/enx-kebord
-Terminal=false
-Categories=AudioVideo;Audio;Utility;
-Keywords=keyboard;sound;mechanical;typing;audio;
-StartupNotify=true
-StartupWMClass=enx-kebord

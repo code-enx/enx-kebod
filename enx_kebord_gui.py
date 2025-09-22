@@ -1,3 +1,17 @@
+ #!/usr/bin/env python3
+ """
+ ENX-Kebord GUI Application
+ Beautiful Linux-friendly interface for managing keyboard sounds
+ """
+
+ # Enforce venv: re-exec with local venv Python if not already using it
+ import os, sys
+ from pathlib import Path
+ BASE = Path(__file__).resolve().parent
+ VENV_PY = BASE / 'venv' / 'bin' / 'python3'
+ if VENV_PY.exists() and Path(sys.executable) != VENV_PY:
+     os.execv(str(VENV_PY), [str(VENV_PY), __file__] + sys.argv[1:])
+
  import tkinter as tk
  from tkinter import ttk, messagebox, filedialog
  import subprocess
@@ -42,8 +56,7 @@
          self.root = root
          self.setup_window()
          self.load_config()
-         # FIX: The create_widgets method requires a parent argument, so we pass the root window.
-         self.create_widgets(self.root)
+         self.create_widgets()
          self.update_status()
          self.start_status_monitor()
 
@@ -96,7 +109,7 @@
          except Exception:
              pass
 
-     def create_widgets(self, parent):
+     def create_widgets(self):
          """Create all GUI widgets"""
          # Main container
          main_frame = ttk.Frame(self.root, style='Modern.TFrame', padding="20")
@@ -406,10 +419,21 @@
                  messagebox.showerror("Error", f"Target directory doesn't exist: {CURRENT_SOUND_FILE.parent}")
                  return
 
-             # Copy sound file to current sound
              import shutil
              try:
+                 # Create a backup of the current sound file if it exists
+                 if CURRENT_SOUND_FILE.exists():
+                     backup_file = CURRENT_SOUND_FILE.with_suffix('.wav.backup')
+                     shutil.copy2(str(CURRENT_SOUND_FILE), str(backup_file))
+
+                 # Copy the new sound file
                  shutil.copy2(str(sound_file), str(CURRENT_SOUND_FILE))
+
+                 import os
+                 os.sync()  # Force filesystem sync
+
+                 time.sleep(0.2)
+
              except PermissionError:
                  messagebox.showerror("Error", f"Permission denied when copying to {CURRENT_SOUND_FILE}")
                  return
@@ -422,6 +446,14 @@
                  messagebox.showerror("Error", "Sound file was not copied successfully")
                  return
 
+             if CURRENT_SOUND_FILE.stat().st_size == 0:
+                 messagebox.showerror("Error", "Sound file was copied but is empty")
+                 return
+
+             if CURRENT_SOUND_FILE.stat().st_size != sound_file.stat().st_size:
+                 messagebox.showerror("Error", "Sound file copy verification failed - sizes don't match")
+                 return
+
              # Update config
              self.config['current_sound'] = sound_key
              self.save_config()
@@ -429,19 +461,28 @@
              # Update the dropdown to show the selected sound
              self.sound_var.set(selected_name)
 
-             # Show success message with more details
-             messagebox.showinfo("Success", f"Sound '{selected_name}' applied successfully!")
-             self.update_current_sound_display()
-
-             # Restart the daemon to apply the changes
-             if self.config.get('daemon_running', False):
-                 try:
-                     subprocess.run([str(DAEMON_SCRIPT), "restart"], check=True)
-                     messagebox.showinfo("Daemon Restart", "Daemon restarted to apply new sound.")
-                 except subprocess.CalledProcessError as e:
-                     messagebox.showerror("Error", f"Failed to restart daemon: {e.stderr}")
+             daemon_running = self.config.get('daemon_running', False)
+             if daemon_running:
+                 success_msg = f"Sound '{selected_name}' applied successfully!\n\nThe daemon will automatically detect and load the new sound within 1-2 seconds."
+                 messagebox.showinfo("Success", success_msg)
+                 self.current_sound_var.set(f"Applied: {selected_name} (Loading...)")
+                 self.root.after(3000, lambda: self.current_sound_var.set(f"Current: {selected_name}"))
              else:
-                 messagebox.showinfo("Note", "Daemon is not running. Start it to activate the new sound.")
+                 success_msg = f"Sound '{selected_name}' applied successfully!\n\nStart the daemon to hear the new sound."
+                 messagebox.showinfo("Success", success_msg)
+                 self.current_sound_var.set(f"Applied: {selected_name} (Start daemon to activate)")
+
+             try:
+                 subprocess.run([
+                     'notify-send',
+                     'enx-kebord',
+                     f"Applied: {selected_name}",
+                     '-t', '2000'
+                 ], check=False)
+             except Exception:
+                 pass  # Ignore notification errors
+
+             self.update_current_sound_display()
 
          except ImportError as e:
              messagebox.showerror("Error", f"Missing required module: {str(e)}")
@@ -449,7 +490,7 @@
              import traceback
              error_details = traceback.format_exc()
              messagebox.showerror("Error", f"Failed to apply sound: {str(e)}\n\nDetails:\n{error_details}")
-             print(f"Apply sound error: {error_details}")
+             print(f"Apply sound error: {error_details}")  # Also print to console for debugging
 
      def refresh_audio_info(self):
          """Refresh audio device information"""
@@ -556,8 +597,8 @@
          try:
              # Start daemon restart in background without waiting
              subprocess.Popen([str(DAEMON_SCRIPT), "restart"],
-                             stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL)
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL)
              # Update status after a short delay
              self.root.after(2000, self.update_status)
          except Exception:

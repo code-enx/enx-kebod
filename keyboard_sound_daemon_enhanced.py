@@ -9,9 +9,9 @@ Features:
 - Global hotkeys for control (Shift+Up/Down, Ctrl+Shift+S)
 - Sound cycling capability
 - Headphone detection (wired/Bluetooth)
+- File monitoring for sound changes
 """
 
-import os
 import sys
 # Enforce venv early: re-exec with local venv Python if not already using it
 from pathlib import Path
@@ -40,12 +40,12 @@ PID_FILE = Path.home() / ".keyboard_sound_daemon.pid"
 CONFIG_FILE = Path.home() / ".keyboard_sound_config.json"
 
 # Available sound types (in order for cycling)
-SOUND_TYPES = ['blue', 'brown', 'red', 'mechanical', 'typewriter', 'creamy', 'dry', 
+SOUND_TYPES = ['blue', 'brown', 'red', 'mechanical', 'typewriter', 'creamy', 'dry',
                'thock', 'clicky', 'silent', 'tactile', 'lofi', 'gx_feryn', 'lee_sin', 'hacker', 'hard']
 
 class AudioDeviceDetector:
     """Detects audio output devices and determines if headphones are connected"""
-    
+
     @staticmethod
     def detect_headphones():
         """Detect if headphones (wired or Bluetooth) are connected"""
@@ -58,7 +58,7 @@ class AudioDeviceDetector:
                 headphone_indicators = ['headphone', 'headset', 'usb audio', 'usb-audio', 'usb_audio']
                 if any(indicator in output_lower for indicator in headphone_indicators):
                     return True
-            
+
             # Method 2: Check ALSA for headphone/USB devices
             result = subprocess.run(['aplay', '-l'], capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
@@ -67,7 +67,7 @@ class AudioDeviceDetector:
                 usb_indicators = ['usb audio', 'usb-audio', 'headphone', 'headset']
                 if any(indicator in output_lower for indicator in usb_indicators):
                     return True
-            
+
             # Method 3: Check for Bluetooth audio devices
             bt_result = subprocess.run(['bluetoothctl', 'devices'], capture_output=True, text=True, timeout=3)
             if bt_result.returncode == 0:
@@ -79,7 +79,7 @@ class AudioDeviceDetector:
                         audio_indicators = ['headphone', 'headset', 'speaker', 'audio']
                         if any(indicator in bt_devices for indicator in audio_indicators):
                             return True
-            
+
             # Method 4: Check /proc/asound/cards for USB/headphone devices
             try:
                 with open('/proc/asound/cards', 'r') as f:
@@ -88,12 +88,12 @@ class AudioDeviceDetector:
                         return True
             except (IOError, FileNotFoundError):
                 pass
-                    
+
         except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
             pass
-        
+
         return False
-    
+
     @staticmethod
     def get_volume_multiplier():
         """Get volume multiplier based on audio device"""
@@ -109,10 +109,12 @@ class KeyboardSoundDaemonEnhanced:
         self.current_sound_index = 0
         self.hotkey_listener = None
         self.pressed_keys = set()
-        
+        self.last_sound_file_mtime = 0
+        self.sound_lock = threading.Lock()  # Thread safety for sound reloading
+
         # Load configuration
         self.load_config()
-        
+
         # Write PID file for process management
         with open(PID_FILE, 'w') as f:
             f.write(str(os.getpid()))
@@ -128,11 +130,14 @@ class KeyboardSoundDaemonEnhanced:
         # Load current sound and detect headphones
         self.load_sound()
         self.update_volume()
-        
+
         # Start volume monitoring thread
         self.volume_monitor_thread = threading.Thread(target=self.monitor_audio_devices, daemon=True)
         self.volume_monitor_thread.start()
-        
+
+        self.file_monitor_thread = threading.Thread(target=self.monitor_sound_file, daemon=True)
+        self.file_monitor_thread.start()
+
         # Start global hotkey listener
         self.start_hotkey_listener()
 
@@ -167,56 +172,79 @@ class KeyboardSoundDaemonEnhanced:
         """Load the current sound file"""
         if CURRENT_SOUND_FILE.exists():
             try:
-                self.sound = pygame.mixer.Sound(str(CURRENT_SOUND_FILE))
+                with self.sound_lock:
+                    max_retries = 3
+                    for attempt in range(max_retries):
+                        try:
+                            self.sound = pygame.mixer.Sound(str(CURRENT_SOUND_FILE))
+                            self.last_sound_file_mtime = CURRENT_SOUND_FILE.stat().st_mtime
+                            break
+                        except pygame.error:
+                            if attempt < max_retries - 1:
+                                time.sleep(0.1)  # Brief delay before retry
+                            else:
+                                self.sound = None
             except Exception:
                 self.sound = None
+
+    def monitor_sound_file(self):
+        """Monitor the sound file for changes and reload when necessary"""
+        while not self.stop_flag:
+            try:
+                if CURRENT_SOUND_FILE.exists():
+                    current_mtime = CURRENT_SOUND_FILE.stat().st_mtime
+                    if current_mtime != self.last_sound_file_mtime:
+                        time.sleep(0.5)  # Wait for file write to complete
+
+                        if CURRENT_SOUND_FILE.stat().st_size > 0:
+                            # File has been modified, reload the sound
+                            self.load_sound()
+                            self.update_volume()
+                            # Optional: Show notification when sound is reloaded
+                            try:
+                                subprocess.run([
+                                    'notify-send',
+                                    'enx-kebord daemon',
+                                    'Sound file updated and reloaded',
+                                    '-t', '1500'
+                                ], check=False)
+                            except:
+                                pass
+                time.sleep(0.5)  # Reduced from 1 second to 0.5 for faster detection
+            except Exception:
+                pass
 
     def update_volume(self):
         """Update volume based on current audio device"""
         self.volume_multiplier = AudioDeviceDetector.get_volume_multiplier()
-        if self.sound:
-            self.sound.set_volume(self.volume_multiplier)
-
-    def monitor_audio_devices(self):
-        """Monitor for audio device changes"""
-        last_headphone_state = AudioDeviceDetector.detect_headphones()
-        
-        while not self.stop_flag:
-            try:
-                current_headphone_state = AudioDeviceDetector.detect_headphones()
-                if current_headphone_state != last_headphone_state:
-                    self.update_volume()
-                    last_headphone_state = current_headphone_state
-                time.sleep(5)  # Check every 5 seconds
-            except Exception:
-                pass
+        with self.sound_lock:
+            if self.sound:
+                self.sound.set_volume(self.volume_multiplier)
 
     def cycle_sound(self):
         """Cycle to the next sound in the list"""
         self.current_sound_index = (self.current_sound_index + 1) % len(SOUND_TYPES)
         current_sound_type = SOUND_TYPES[self.current_sound_index]
-        
+
         # Update the current sound file
         sound_file = SOUND_DIR / f"keyboard_{current_sound_type}.wav"
         if sound_file.exists():
             try:
                 # Copy the new sound to the current sound file
                 subprocess.run(['cp', str(sound_file), str(CURRENT_SOUND_FILE)], check=True)
-                self.load_sound()
-                self.update_volume()
                 self.save_config()
-                
+
                 # Show notification (if available)
                 try:
                     subprocess.run([
-                        'notify-send', 
-                        'enx-kebord', 
+                        'notify-send',
+                        'enx-kebord',
                         f'Switched to: {current_sound_type}',
                         '-t', '2000'
                     ], check=False)
                 except:
                     pass
-                    
+
             except subprocess.SubprocessError:
                 pass
 
@@ -224,7 +252,7 @@ class KeyboardSoundDaemonEnhanced:
         """Start the global hotkey listener"""
         def on_press(key):
             self.pressed_keys.add(key)
-            
+
             # Check for hotkey combinations
             if self.is_hotkey_pressed([Key.shift, Key.up]):
                 self.start_daemon()
@@ -251,12 +279,12 @@ class KeyboardSoundDaemonEnhanced:
     def start_daemon(self):
         """Handle daemon start hotkey (placeholder - daemon is already running)"""
         try:
-                    subprocess.run([
-                        'notify-send', 
-                        'enx-kebord daemon', 
-                        'Already running',
-                        '-t', '1000'
-                    ], check=False)
+            subprocess.run([
+                'notify-send',
+                'enx-kebord daemon',
+                'Already running',
+                '-t', '1000'
+            ], check=False)
         except:
             pass
 
@@ -265,8 +293,8 @@ class KeyboardSoundDaemonEnhanced:
         self.stop_flag = True
         try:
             subprocess.run([
-                'notify-send', 
-                'enx-kebord daemon', 
+                'notify-send',
+                'enx-kebord daemon',
                 'Stopping daemon...',
                 '-t', '1000'
             ], check=False)
@@ -279,7 +307,9 @@ class KeyboardSoundDaemonEnhanced:
             return
 
         try:
-            self.sound.play()
+            with self.sound_lock:
+                if self.sound:
+                    self.sound.play()
         except Exception:
             pass  # Silently ignore audio errors
 
@@ -296,21 +326,21 @@ class KeyboardSoundDaemonEnhanced:
     def signal_handler(self, signum, frame):
         """Handle termination signals"""
         self.stop_flag = True
-        
+
     def cleanup(self):
         """Clean up resources"""
         try:
             pygame.mixer.quit()
         except:
             pass
-        
+
         # Stop hotkey listener
         if self.hotkey_listener:
             try:
                 self.hotkey_listener.stop()
             except:
                 pass
-        
+
         # Remove PID file
         try:
             if PID_FILE.exists():
@@ -328,21 +358,35 @@ class KeyboardSoundDaemonEnhanced:
             with keyboard.Listener(
                 on_press=self.on_press,
                 on_release=self.on_release) as listener:
-                
+
                 # Keep the daemon running
                 while not self.stop_flag:
                     time.sleep(0.1)
-                    
+
         except Exception:
             pass  # Silently handle any errors
         finally:
             self.cleanup()
+
+    def monitor_audio_devices(self):
+        """Monitor for audio device changes"""
+        last_headphone_state = AudioDeviceDetector.detect_headphones()
+
+        while not self.stop_flag:
+            try:
+                current_headphone_state = AudioDeviceDetector.detect_headphones()
+                if current_headphone_state != last_headphone_state:
+                    self.update_volume()
+                    last_headphone_state = current_headphone_state
+                time.sleep(5)  # Check every 5 seconds
+            except Exception:
+                pass
 
 if __name__ == "__main__":
     # Redirect stdout and stderr to suppress all output
     devnull = open(os.devnull, 'w')
     sys.stdout = devnull
     sys.stderr = devnull
-    
+
     daemon = KeyboardSoundDaemonEnhanced()
     daemon.run()

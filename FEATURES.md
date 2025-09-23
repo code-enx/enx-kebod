@@ -65,17 +65,17 @@ Including your requested **"hard"** sound:
 
 ## 📁 **Installation Structure**
 
-```bash
+\`\`\`bash
 # What gets installed:
 ~/.local/share/enx-kebord/          # Main application
 ~/.local/bin/enx-kebord            # Command launcher  
 ~/.local/share/applications/       # Application menu entry
 ~/.config/autostart/               # Auto-start daemon (no GUI)
-```
+\`\`\`
 
 ## 🚀 **Complete Installation Process**
 
-```bash
+\`\`\`bash
 # 1. Clone (ready for GitHub)
 git clone https://github.com/code-enx/Mech_keyboard_enx-.git
 cd enx-kebord
@@ -85,7 +85,7 @@ cd enx-kebord
 
 # 3. Done! Daemon auto-starts, GUI launches manually
 enx-kebord  # Opens beautiful GUI
-```
+\`\`\`
 
 ## 🎛️ **GUI Features Overview**
 

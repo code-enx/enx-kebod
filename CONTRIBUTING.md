@@ -14,8 +14,8 @@ Thank you for your interest in contributing! 🎉
 
 ## 🎯 Ways to Contribute
 
-###  Bug Reports
-- Use the [issue tracker](https://github.com/code-enx/enx-kebod/issues)
+### 🐛 Bug Reports
+- Use the [issue tracker](https://github.com/code-enx/Mech_keyboard_enx-/issues)
 - Include steps to reproduce
 - Mention your OS and Python version
 
@@ -44,7 +44,7 @@ Thank you for your interest in contributing! 🎉
 
 ## 🔧 Testing
 
-```bash
+\`\`\`bash
 # Test daemon functionality
 ./keyboard_sound_control.sh start
 # Type some keys to verify sounds
@@ -52,7 +52,7 @@ Thank you for your interest in contributing! 🎉
 
 # Test audio system
 python3 test_audio.py
-```
+\`\`\`
 
 ## 📝 Code Style
 

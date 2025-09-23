@@ -2,31 +2,31 @@
 
 ## Quick One-Line Installation
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/code-enx/enx-kebod/main/install.sh | bash -s -- --from-github
-```
+\`\`\`bash
+curl -fsSL https://raw.githubusercontent.com/code-enx/Mech_keyboard_enx-/main/install.sh | bash -s -- --from-github
+\`\`\`
 
 ## Manual Installation
 
 ### 1. Clone the Repository
-```bash
-git clone https://github.com/code-enx/enx kebod.git
-cd enx-kebod
-```
+\`\`\`bash
+git clone https://github.com/code-enx/Mech_keyboard_enx-.git
+cd Mech_keyboard_enx-
+\`\`\`
 
 ### 2. Run the Installer
-```bash
+\`\`\`bash
 chmod +x install.sh
 ./install.sh
-```
+\`\`\`
 
 ### 3. Launch the Application
-```bash
+\`\`\`bash
 # From command line
 enx-kebord
 
 # Or search "enx-kebord" in your applications menu
-```
+\`\`\`
 
 ## System Requirements
 
@@ -56,7 +56,7 @@ The installer will:
 
 ## Uninstallation
 
-```bash
+\`\`\`bash
 # Remove application files
 rm -rf ~/.local/share/enx-kebord
 
@@ -70,26 +70,26 @@ rm -f ~/.local/bin/enx-kebord
 # Remove config
 rm -f ~/.enx_kebord_config.json
 rm -f ~/.keyboard_sound_config.json
-```
+\`\`\`
 
 ## Troubleshooting
 
 ### Audio Issues
-```bash
+\`\`\`bash
 # Test audio system
 pactl info
 aplay -l
-```
+\`\`\`
 
 ### Permission Issues
-```bash
+\`\`\`bash
 # Make scripts executable
 chmod +x ~/.local/share/enx-kebord/*.sh
 chmod +x ~/.local/share/enx-kebord/*.py
-```
+\`\`\`
 
 ### Missing Dependencies
-```bash
+\`\`\`bash
 # Ubuntu/Debian
 sudo apt install python3 python3-pip python3-venv git alsa-utils pulseaudio-utils
 
@@ -98,10 +98,10 @@ sudo dnf install python3 python3-pip git alsa-utils pulseaudio-utils
 
 # Arch
 sudo pacman -S python python-pip git alsa-utils pulseaudio
-```
+\`\`\`
 
 ## Support
 
-- !!**Issues**: https://github.com/code-enx/enx kebod/issues
-- 📖 **Documentation**: https://github.com/code-enx/enx kebod
-- 💬 **Discussions**: https://github.com/code-enx/enx kebod/discussions
+- 🐛 **Issues**: https://github.com/code-enx/Mech_keyboard_enx-/issues
+- 📖 **Documentation**: https://github.com/code-enx/Mech_keyboard_enx-
+- 💬 **Discussions**: https://github.com/code-enx/Mech_keyboard_enx-/discussions

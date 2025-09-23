@@ -35,7 +35,7 @@
 
 ## ⚡ Quick Start
 
-```bash
+\`\`\`bash
 # 1. Run the enhanced setup (creates venv, installs deps, generates sounds)
 ./setup_enhanced.sh
 
@@ -48,7 +48,7 @@
 # 4. Try the new global hotkeys!
 # Ctrl+Shift+S to cycle sounds
 # Shift+↓ to stop, Shift+↑ to start
-```
+\`\`\`
 
 **That's it!** Your keyboard now has enhanced mechanical sounds with global controls! 🎉
 
@@ -137,22 +137,22 @@
 ## 🛠️ Enhanced Controls
 
 ### New Sound Control Script
-```bash
+\`\`\`bash
 # Advanced sound management
 ./sound_control.sh list         # Show all available sounds
 ./sound_control.sh switch hard  # Switch to specific sound
 ./sound_control.sh current      # Show current sound + audio device
 ./sound_control.sh hotkeys      # Display all global hotkeys
 ./sound_control.sh generate     # Generate all sound files
-```
+\`\`\`
 
 ### Traditional Controls (Still Work)
-```bash
+\`\`\`bash
 ./keyboard_sound_control.sh start    # Start daemon
 ./keyboard_sound_control.sh stop     # Stop daemon  
 ./keyboard_sound_control.sh status   # Check status
 ./keyboard_sound_control.sh restart  # Restart daemon
-```
+\`\`\`
 
 ---
 
@@ -166,7 +166,7 @@
 
 ### 🛠️ Enhanced Setup
 
-```bash
+\`\`\`bash
 # One-command setup (recommended)
 ./setup_enhanced.sh
 
@@ -177,16 +177,16 @@ pip install -r requirements.txt
 chmod +x *.sh *.py
 ./venv/bin/python3 sound_generator.py --type all
 ./keyboard_sound_control.sh start
-```
+\`\`\`
 
 ---
 
 ## ⚙️ Configuration
 
 ### Config File Location
-```bash
+\`\`\`bash
 ~/.keyboard_sound_config.json
-```
+\`\`\`
 
 ### What's Stored
 - Current sound preference
@@ -194,27 +194,27 @@ chmod +x *.sh *.py
 - User preferences
 
 ### Sound Files Location
-```bash
+\`\`\`bash
 ./generated_sounds/
 ├── keyboard_blue.wav
 ├── keyboard_brown.wav
 ├── keyboard_hard.wav    # 🆕 New!
 └── ... (13 more sounds)
-```
+\`\`\`
 
 ---
 
 ## ✅ Verification
 
-```bash
+\`\`\`bash
 # Run sanity checks (path, venv, sounds, launchers)
 ./verify_enx_kebord.sh
-```
+\`\`\`
 
 ## 🔧 Troubleshooting
 
 ### Global Hotkeys Not Working
-```bash
+\`\`\`bash
 # Check if daemon is running
 ./keyboard_sound_control.sh status
 
@@ -223,10 +223,10 @@ chmod +x *.sh *.py
 
 # Check for permission issues
 ls -la keyboard_sound_daemon_enhanced.py
-```
+\`\`\`
 
 ### Audio Issues
-```bash
+\`\`\`bash
 # Test audio detection
 ./sound_control.sh current
 
@@ -234,16 +234,16 @@ ls -la keyboard_sound_daemon_enhanced.py
 pactl list sinks short     # PulseAudio
 aplay -l                   # ALSA
 bluetoothctl devices       # Bluetooth
-```
+\`\`\`
 
 ### Notifications Not Showing
-```bash
+\`\`\`bash
 # Test notification system
 notify-send "Test" "This is a test notification"
 
 # Install if missing (Ubuntu/Debian)
 sudo apt install libnotify-bin
-```
+\`\`\`
 
 ---
 
@@ -256,7 +256,7 @@ sudo apt install libnotify-bin
 4. **Restart later**: Press `Shift+↑`
 
 ### Power User Tips
-```bash
+\`\`\`bash
 # Generate a specific sound on demand
 python3 sound_generator.py --type hard --duration 0.2
 
@@ -265,13 +265,13 @@ python3 sound_generator.py --type hard --duration 0.2
 
 # Check what's currently running
 ./sound_control.sh current
-```
+\`\`\`
 
 ---
 
 ## 📋 File Structure
 
-```
+\`\`\`
 enx kebod/
 ├── 🆕 keyboard_sound_daemon_enhanced.py  # Enhanced daemon
 ├── 🆕 sound_control.sh                   # Advanced controls
@@ -284,16 +284,16 @@ enx kebod/
 │   └── ... (15 other sounds)
 ├── 📋 requirements.txt                   # Dependencies (updated)
 └── 📚 README_ENHANCED.md                 # This documentation
-```
+\`\`\`
 
 ---
 
 ## 🚨 What Changed from Original
 
 ### New Dependencies
-```
+\`\`\`
 psutil>=5.8.0    # For system process monitoring
-```
+\`\`\`
 
 ### New Files
 - `keyboard_sound_daemon_enhanced.py` - Main enhanced daemon
@@ -312,14 +312,14 @@ psutil>=5.8.0    # For system process monitoring
 
 ## 🎉 Ready to Rock?
 
-```bash
+\`\`\`bash
 # Get started in seconds
 ./setup_enhanced.sh
 ./keyboard_sound_control.sh start
 
 # Try the new hotkeys
 # Ctrl+Shift+S to cycle sounds!
-```
+\`\`\`
 
 **Transform your typing experience with enhanced mechanical keyboard sounds!** ⌨️✨
 

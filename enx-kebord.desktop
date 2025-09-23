@@ -1,9 +1,14 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=ENX-Kebord
+Name=enx-kebord
 GenericName=Keyboard Sound Manager
 Comment=Mechanical keyboard sound experience with beautiful GUI
-Exec=/opt/enx-kebord/launch_gui.sh
-Icon=/opt/enx-kebord/enx-kebord-icon.png
-Path=/opt/enx-kebord
+Exec=launch_gui.sh
+Icon=enx-kebord-icon.png
+Terminal=false
+Categories=AudioVideo;Audio;Utility;
+Keywords=keyboard;sound;mechanical;typing;audio;
+StartupNotify=true
+MimeType=
+StartupWMClass=enx-kebord
